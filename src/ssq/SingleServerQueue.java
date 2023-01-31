@@ -8,8 +8,8 @@ public class SingleServerQueue extends Simulation<SingleServerQueue> {
   private final Random generator;
   private final double duration;
   private int queueLength;
-  private double totalQueueTime;
-  private int totalCustomerAmount;
+  private double cumulativeQueueLength;
+  private double queueLengthRecordedUntil;
   public final static double SERVICE_TIME = 0.25;
 
   public SingleServerQueue(long seed, double duration) {
@@ -17,8 +17,8 @@ public class SingleServerQueue extends Simulation<SingleServerQueue> {
     this.generator = new Random(seed);
     this.duration = duration;
     this.queueLength = 0;
-    this.totalQueueTime = 0;
-    this.totalCustomerAmount = 0;
+    this.cumulativeQueueLength = 0;
+    this.queueLengthRecordedUntil = 0;
     this.schedule(new Arrival(), getNextArrival());
   }
 
@@ -36,16 +36,33 @@ public class SingleServerQueue extends Simulation<SingleServerQueue> {
     return generator.nextDouble();
   }
 
+  /**
+   * Called during an arrival. Updates the cumulative queue length and increases the queue length
+   * by 1.
+   */
   public void incrementQueue() {
+    cumulativeQueueLength += (currentTime - queueLengthRecordedUntil) * queueLength;
     queueLength += 1;
+    queueLengthRecordedUntil = currentTime;
   }
 
+  /**
+   * Called during a departure. Updates the cumulative queue length and decreases the queue
+   * length by 1.
+   */
   public void decrementQueue() {
+    cumulativeQueueLength += (currentTime - queueLengthRecordedUntil) * queueLength;
     queueLength -= 1;
+    queueLengthRecordedUntil = currentTime;
   }
 
   public int getQueueLength() {
     return queueLength;
+  }
+
+  public double getMeanQueueLength() {
+    cumulativeQueueLength += (duration - getCurrentTime()) * queueLength;
+    return cumulativeQueueLength / duration;
   }
 
   /**
@@ -57,6 +74,6 @@ public class SingleServerQueue extends Simulation<SingleServerQueue> {
     double duration = Double.parseDouble(args[1]);
     SingleServerQueue s = new SingleServerQueue(seed, duration);
     s.simulate();
-    System.out.println("SIMULATION COMPLETE");
+    System.out.println("SIMULATION COMPLETE - the mean queue length was " + s.getMeanQueueLength());
   }
 }
