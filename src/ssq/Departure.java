@@ -8,7 +8,7 @@ public class Departure implements Event<SingleServerQueue> {
   public void invoke(SingleServerQueue simulation) {
     simulation.decrementQueue();
     simulation.incrementTotalService();
-    System.out.println("Departure at " + simulation.getCurrentTime() + " new population = "
+    System.out.println("Departure at " + simulation.getCurrentTime() + ", new population = "
         + simulation.getQueueLength());
     if (simulation.getQueueLength() > 0) {
       simulation.schedule(new Departure(), SingleServerQueue.SERVICE_TIME);

@@ -7,8 +7,8 @@ public class Arrival implements Event<SingleServerQueue> {
   @Override
   public void invoke(SingleServerQueue simulation) {
     simulation.incrementQueue();
-    System.out.println("Arrival at " + simulation.getCurrentTime() + " new "
-        + "population = " + simulation.getQueueLength());
+    System.out.println("Arrival at " + simulation.getCurrentTime() + ", new population = "
+        + simulation.getQueueLength());
 
     // Schedule the next arrival after a random amount of time
     double nextArrival = simulation.getNextArrival();
